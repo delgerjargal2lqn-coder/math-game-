@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ананд түүний найзуудын сансрын тоон хүрдний аялал</title>
+    <!-- Tailwind CSS-ийг ашиглан өнгөлөг загвар гаргах -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Хүүхдэд зориулсан гоёмсог фонт оруулж ирэх -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .title-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        /* Бөмбөлөг хөөрөх хөдөлгөөн */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        /* Буруу хариулахад чичрэх хөдөлгөөн */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake-effect {
+            animation: shake 0.3s ease-in-out;
+        }
+        /* Зөв хариулахад томрох хөдөлгөөн */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .pop-effect {
+            animation: pop 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-800 min-h-screen flex items-center justify-center p-4 overflow-x-hidden text-white select-none">
+
+    <!-- Гол тоглоомын карт -->
+    <div id="game-container" class="bg-white/10 backdrop-blur-md border-4 border-white/20 rounded-3xl p-6 w-full max-w-xl shadow-2xl relative transition-all duration-300">
+        
+        <!-- холбогдож буй төлөв заагч -->
+        <div id="connection-status" class="absolute top-4 right-4 text-xs bg-black/30 px-3 py-1 rounded-full text-green-300 flex items-center gap-1">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span> Онлайн онооны систем
+        </div>
+
+        <!-- 1. НҮҮР ХУУДАС (Эхлэл) -->
+        <div id="start-screen" class="text-center space-y-6 pt-6">
+            <h1 class="title-font text-2xl sm:text-3xl text-yellow-300 drop-shadow-[0_4px_0_rgba(0,0,0,0.4)] tracking-wider floating leading-tight">
+                АНАНД ТҮҮНИЙ НАЙЗУУДЫН САНСРЫН ТООН ХҮРДНИЙ АЯЛАЛ
+            </h1>
+            <p class="text-lg text-pink-200 font-bold">7 настай математикийн баатруудад зориулав 🚀</p>
+            
+            <!-- Нэр оруулах хэсэг -->
+            <div class="space-y-2 max-w-sm mx-auto">
+                <label class="block text-md font-bold text-yellow-200 text-left">Сансрын нисгэгчийн нэр:</label>
+                <input type="text" id="player-name-input" maxlength="12" placeholder="Баатар..." 
+                       class="w-full px-4 py-3 bg-white/10 border-2 border-white/20 rounded-2xl text-white text-lg font-bold placeholder-white/40 focus:outline-none focus:border-yellow-300 transition-all text-center">
+            </div>
+
+            <!-- Баатрын сонголт -->
+            <div class="space-y-2">
+                <p class="text-md font-bold text-yellow-200">Өөрийн баатраа сонгоорой:</p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="selectAvatar('🐱')" id="avatar-btn-🐱" class="avatar-btn text-4xl p-3 bg-white/20 rounded-2xl hover:bg-yellow-400/50 border-2 border-yellow-300 transition-all scale-110">🐱</button>
+                    <button onclick="selectAvatar('🐶')" id="avatar-btn-🐶" class="avatar-btn text-4xl p-3 bg-white/10 rounded-2xl hover:bg-yellow-400/50 border-2 border-transparent transition-all">🐶</button>
+                    <button onclick="selectAvatar('🦊')" id="avatar-btn-🦊" class="avatar-btn text-4xl p-3 bg-white/10 rounded-2xl hover:bg-yellow-400/50 border-2 border-transparent transition-all">🦊</button>
+                    <button onclick="selectAvatar('🐻')" id="avatar-btn-🐻" class="avatar-btn text-4xl p-3 bg-white/10 rounded-2xl hover:bg-yellow-400/50 border-2 border-transparent transition-all">🐻</button>
+                    <button onclick="selectAvatar('🦁')" id="avatar-btn-🦁" class="avatar-btn text-4xl p-3 bg-white/10 rounded-2xl hover:bg-yellow-400/50 border-2 border-transparent transition-all">🦁</button>
+                </div>
+            </div>
+
+            <!-- Хүрд сонгох хэсэг -->
+            <div class="space-y-2">
+                <p class="text-md font-bold text-yellow-200">Цээжлэх хүрдээ сонгоно уу:</p>
+                <div class="grid grid-cols-5 gap-2 max-w-sm mx-auto">
+                    <button onclick="selectTable(2)" id="table-btn-2" class="table-btn py-2 px-3 bg-yellow-400 text-purple-950 font-black rounded-xl border border-white/20 transition-all">2</button>
+                    <button onclick="selectTable(3)" id="table-btn-3" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">3</button>
+                    <button onclick="selectTable(4)" id="table-btn-4" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">4</button>
+                    <button onclick="selectTable(5)" id="table-btn-5" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">5</button>
+                    <button onclick="selectTable(6)" id="table-btn-6" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">6</button>
+                    <button onclick="selectTable(7)" id="table-btn-7" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">7</button>
+                    <button onclick="selectTable(8)" id="table-btn-8" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">8</button>
+                    <button onclick="selectTable(9)" id="table-btn-9" class="table-btn py-2 px-3 bg-white/10 rounded-xl hover:bg-white/20 font-bold border border-white/20 transition-all">9</button>
+                    <button onclick="selectTable('Бүгд')" id="table-btn-Бүгд" class="table-btn col-span-2 py-2 px-3 bg-pink-500/50 hover:bg-pink-500/70 font-bold rounded-xl border border-white/20 transition-all">Бүгд 🌀</button>
+                </div>
+            </div>
+
+            <!-- Тоглоом эхлэх болон онооны самбар үзэх товч -->
+            <div class="flex flex-col gap-3 max-w-sm mx-auto pt-2">
+                <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 font-extrabold text-2xl text-purple-950 rounded-2xl shadow-lg border-b-4 border-orange-700 active:border-b-0 transition-all transform hover:scale-105">
+                    Аялалд гарах 🚀
+                </button>
+                <button onclick="showLeaderboardScreen()" class="w-full py-2 bg-purple-700/50 hover:bg-purple-700/70 border border-purple-500/50 font-bold text-sm rounded-xl transition-all">
+                    Шилдэг нисгэгчдийг харах 🏆
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. ТОГЛООМЫН ТАЛБАР -->
+        <div id="game-screen" class="hidden space-y-6">
+            <!-- Тоглоомын дээд хэсэг: Оноо ба Баатар -->
+            <div class="flex justify-between items-center bg-black/20 p-3 rounded-2xl">
+                <div class="flex items-center gap-2">
+                    <span id="player-avatar" class="text-3xl">🐱</span>
+                    <div>
+                        <p id="player-hud-name" class="text-xs text-slate-300 font-bold">Баатар</p>
+                        <p id="player-streak" class="text-sm font-bold text-yellow-300">Амжилттай эхэллээ!</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-300">Оноо</p>
+                    <p id="score-display" class="text-xl font-black text-yellow-300">0 / 10</p>
+                </div>
+            </div>
+
+            <!-- Пуужингийн явц заагч (Анимейшн бүхий шугам) -->
+            <div class="relative bg-white/10 h-10 rounded-full flex items-center px-4 overflow-hidden border border-white/20">
+                <div class="absolute text-2xl z-10 transition-all duration-500 ease-out" id="rocket-indicator" style="left: 10px;">🚀</div>
+                <div class="absolute right-4 text-2xl z-10">🪐</div>
+                <!-- Өнгөт дүүргэлт -->
+                <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <!-- Бодлого илрэх хэсэг -->
+            <div class="text-center py-8 bg-white/5 rounded-3xl border-2 border-white/10 relative">
+                <p id="question-text" class="title-font text-5xl sm:text-6xl tracking-widest text-yellow-300 drop-shadow-[0_4px_0_rgba(0,0,0,0.3)]">
+                    3 × 4 = ?
+                </p>
+            </div>
+
+            <!-- Хариултын хувилбарууд (4 том өнгөлөг товч) -->
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="checkAnswer(this)" class="option-btn py-5 bg-gradient-to-r from-blue-500 to-cyan-500 text-3xl font-black rounded-2xl border-b-4 border-blue-700 hover:brightness-110 active:border-b-0 transition-all"></button>
+                <button onclick="checkAnswer(this)" class="option-btn py-5 bg-gradient-to-r from-green-500 to-emerald-500 text-3xl font-black rounded-2xl border-b-4 border-green-700 hover:brightness-110 active:border-b-0 transition-all"></button>
+                <button onclick="checkAnswer(this)" class="option-btn py-5 bg-gradient-to-r from-yellow-500 to-amber-500 text-3xl font-black rounded-2xl border-b-4 border-yellow-700 hover:brightness-110 active:border-b-0 transition-all"></button>
+                <button onclick="checkAnswer(this)" class="option-btn py-5 bg-gradient-to-r from-pink-500 to-rose-500 text-3xl font-black rounded-2xl border-b-4 border-pink-700 hover:brightness-110 active:border-b-0 transition-all"></button>
+            </div>
+
+            <!-- Урамшууллын зурвас -->
+            <div id="feedback-message" class="text-center text-xl font-bold h-8 text-yellow-300 transition-all duration-300"></div>
+        </div>
+
+        <!-- 3. ҮР ДҮНГИЙН ХУУДАС (Төгсгөл) -->
+        <div id="result-screen" class="hidden text-center space-y-6">
+            <h2 class="title-font text-3xl text-yellow-300 leading-tight">АНАНД БА ТҮҮНИЙ НАЙЗУУДЫН САНСРЫН АЯЛАЛ АМЖИЛТТАЙ! 🏆</h2>
+            
+            <!-- Одод цуглуулах анимейшн -->
+            <div class="flex justify-center gap-4 text-5xl py-2" id="stars-container">
+                <span class="star-item transition-all duration-500 transform scale-50 opacity-30">⭐</span>
+                <span class="star-item transition-all duration-500 transform scale-50 opacity-30">⭐</span>
+                <span class="star-item transition-all duration-500 transform scale-50 opacity-30">⭐</span>
+            </div>
+
+            <p id="final-stats" class="text-xl font-bold">Та 10-аас 8 асуултанд зөв хариуллаа!</p>
+            
+            <div class="bg-white/10 p-3 rounded-2xl text-md border border-white/10">
+                <p id="motivation-text" class="text-pink-200">Үнэхээр гайхалтай! Та бол математикийн супер баатар юм!</p>
+            </div>
+
+            <!-- Дотроо онооны самбарыг шууд ачаалж харуулах хэсэг -->
+            <div class="bg-black/30 p-4 rounded-2xl border border-white/10">
+                <h3 class="text-yellow-300 font-bold mb-2 flex items-center justify-center gap-1">🏆 Шилдэг нисгэгчид</h3>
+                <div id="result-leaderboard-loading" class="text-sm text-slate-300">Оноог хуулж байна...</div>
+                <div id="result-leaderboard-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 hidden">
+                    <!-- Онооны жагсаалт энд орно -->
+                </div>
+            </div>
+
+            <!-- Дахин тоглох товч -->
+            <button onclick="restartGame()" class="w-full max-w-sm py-4 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-300 hover:to-emerald-400 font-extrabold text-2xl text-purple-950 rounded-2xl shadow-lg border-b-4 border-emerald-700 active:border-b-0 transition-all transform hover:scale-105">
+                Дахиад тоглох 🔄
+            </button>
+        </div>
+
+        <!-- 4. ОНООНЫ САМБАР ДЭЛГЭЦ (Зөвхөн үзэх) -->
+        <div id="leaderboard-screen" class="hidden text-center space-y-4">
+            <h2 class="title-font text-2xl text-yellow-300 leading-tight">🏆 ШИЛДЭГ НИСГЭГЧИД</h2>
+            <p class="text-xs text-pink-200">Ананд ба түүний найзуудын дундах хамгийн сайн цээжилсэн баатрууд</p>
+            
+            <div class="bg-black/30 p-4 rounded-2xl border border-white/10 min-h-[250px] flex flex-col justify-between">
+                <div id="global-leaderboard-loading" class="text-sm text-slate-300 py-10">Тэнгэрийн ододыг тоолж байна... 🚀</div>
+                <div id="global-leaderboard-list" class="space-y-2 max-h-64 overflow-y-auto pr-1 hidden">
+                    <!-- Жагсаалт -->
+                </div>
+            </div>
+
+            <button onclick="hideLeaderboardScreen()" class="w-full max-w-sm py-3 bg-white/10 hover:bg-white/20 border border-white/30 font-bold text-lg rounded-2xl transition-all">
+                Буцах 🔙
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDK ачаалах хэсэг -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Тоглоомын төлөв хадгалах хувьсагчид
+        let selectedAvatarChar = '🐱';
+        let selectedTableNum = 2; 
+        let score = 0;
+        let questionIndex = 0;
+        const totalQuestions = 10;
+        let correctAnswer = 0;
+        let streak = 0;
+        let isAnswered = false;
+        let playerName = "";
+
+        // Firebase холболт
+        let db = null;
+        let auth = null;
+        let user = null;
+        let useFirebase = false;
+
+        // Орчны өгөгдлүүд
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-math-game';
+
+        // Firebase-ийг үүсгэх
+        if (typeof __firebase_config !== 'undefined') {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                useFirebase = true;
+            } catch (e) {
+                console.error("Firebase холболтод алдаа гарлаа:", e);
+                document.getElementById('connection-status').innerText = "Оффлайн горим 🛰️";
+                document.getElementById('connection-status').className = "absolute top-4 right-4 text-xs bg-black/30 px-3 py-1 rounded-full text-yellow-300";
+            }
+        } else {
+            document.getElementById('connection-status').innerText = "Оффлайн горим 🛰️";
+            document.getElementById('connection-status').className = "absolute top-4 right-4 text-xs bg-black/30 px-3 py-1 rounded-full text-yellow-300";
+        }
+
+        // Хэрэглэгчийг нэвтрүүлэх ажиллагаа
+        const initAuth = async () => {
+            if (!useFirebase) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Нэвтрэлт амжилтгүй:", e);
+            }
+        };
+
+        initAuth();
+
+        if (auth) {
+            onAuthStateChanged(auth, (usr) => {
+                user = usr;
+                if (usr) {
+                    console.log("Сансарт нэвтэрсэн хэрэглэгчийн ID:", usr.uid);
+                }
+            });
+        }
+
+        // LocalStorage-оос өмнөх нэрийг авах
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('math_game_player_name');
+            if (savedName) {
+                document.getElementById('player-name-input').value = savedName;
+            }
+        });
+
+        // Дууны эффектүүдийг Web Audio API ашиглан хийх
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                if (type === 'correct') {
+                    playTone(523.25, 'sine', 0.1); 
+                    setTimeout(() => playTone(659.25, 'sine', 0.1), 100); 
+                    setTimeout(() => playTone(783.99, 'sine', 0.15), 200); 
+                } else if (type === 'wrong') {
+                    playTone(180, 'sawtooth', 0.25); 
+                } else if (type === 'click') {
+                    playTone(400, 'sine', 0.05); 
+                } else if (type === 'win') {
+                    let notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+                    notes.forEach((note, index) => {
+                        setTimeout(() => playTone(note, 'sine', 0.15), index * 100);
+                    });
+                }
+            } catch (e) {
+                console.log("Дуу тоглуулах боломжгүй:", e);
+            }
+        }
+
+        function playTone(freq, type, duration) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // Баатар сонгох
+        function selectAvatar(avatar) {
+            playSound('click');
+            selectedAvatarChar = avatar;
+            
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                btn.classList.remove('border-yellow-300', 'scale-110', 'bg-white/20');
+                btn.classList.add('border-transparent', 'bg-white/10');
+            });
+            const selectedBtn = document.getElementById(`avatar-btn-${avatar}`);
+            selectedBtn.classList.add('border-yellow-300', 'scale-110', 'bg-white/20');
+            selectedBtn.classList.remove('border-transparent', 'bg-white/10');
+        }
+
+        // Хүрд сонгох
+        function selectTable(table) {
+            playSound('click');
+            selectedTableNum = table;
+            
+            document.querySelectorAll('.table-btn').forEach(btn => {
+                btn.classList.remove('bg-yellow-400', 'text-purple-950', 'font-black');
+                btn.classList.add('bg-white/10', 'text-white', 'font-bold');
+            });
+            const selectedBtn = document.getElementById(`table-btn-${table}`);
+            selectedBtn.classList.add('bg-yellow-400', 'text-purple-950', 'font-black');
+            selectedBtn.classList.remove('bg-white/10', 'text-white', 'font-bold');
+        }
+
+        // Тоглоом эхлүүлэх
+        function startGame() {
+            playSound('click');
+            
+            // Нэр авч хадгалах
+            const inputName = document.getElementById('player-name-input').value.trim();
+            playerName = inputName || "Сансрын баатар";
+            localStorage.setItem('math_game_player_name', playerName);
+
+            // Дэлгэц солих
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Тоглогчийн мэдээллийг оноох
+            document.getElementById('player-avatar').innerText = selectedAvatarChar;
+            document.getElementById('player-hud-name').innerText = playerName;
+            
+            score = 0;
+            questionIndex = 0;
+            streak = 0;
+            updateStats();
+            nextQuestion();
+        }
+
+        // Дараагийн асуултыг үүсгэх
+        function nextQuestion() {
+            isAnswered = false;
+            document.getElementById('feedback-message').innerText = "";
+            
+            let multiplier1 = selectedTableNum;
+            if (selectedTableNum === 'Бүгд') {
+                multiplier1 = Math.floor(Math.random() * 8) + 2; 
+            }
+            let multiplier2 = Math.floor(Math.random() * 9) + 1; 
+            
+            correctAnswer = multiplier1 * multiplier2;
+            
+            document.getElementById('question-text').innerText = `${multiplier1} × ${multiplier2} = ?`;
+            
+            let answers = [correctAnswer];
+            
+            while (answers.length < 4) {
+                let offset = (Math.floor(Math.random() * 5) + 1) * (Math.random() < 0.5 ? -1 : 1);
+                let wrongAns = correctAnswer + offset;
+                if (wrongAns > 0 && !answers.includes(wrongAns)) {
+                    answers.push(wrongAns);
+                }
+            }
+            
+            answers.sort(() => Math.random() - 0.5);
+            
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach((btn, idx) => {
+                btn.innerText = answers[idx];
+                btn.disabled = false;
+                btn.className = btn.className.replace(/opacity-\d+/g, "").trim();
+                btn.classList.remove('scale-95');
+            });
+
+            questionIndex++;
+            updateStats();
+        }
+
+        // Хариултыг шалгах
+        function checkAnswer(selectedBtn) {
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            const selectedVal = parseInt(selectedBtn.innerText);
+            const container = document.getElementById('game-container');
+            const feedback = document.getElementById('feedback-message');
+            
+            document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+            if (selectedVal === correctAnswer) {
+                playSound('correct');
+                score++;
+                streak++;
+                
+                selectedBtn.classList.add('pop-effect');
+                setTimeout(() => selectedBtn.classList.remove('pop-effect'), 400);
+                
+                let messages = ["Үнэхээр мундаг! 🎉", "Төгс байна! ✨", "Маш сайн! ⭐", "Чи бол сансрын баатар! 🚀", "Урагшаа! 💪"];
+                feedback.innerText = messages[Math.floor(Math.random() * messages.length)];
+                feedback.className = "text-center text-xl font-bold h-8 text-green-400 animate-pulse";
+            } else {
+                playSound('wrong');
+                streak = 0;
+                
+                container.classList.add('shake-effect');
+                setTimeout(() => container.classList.remove('shake-effect'), 400);
+                
+                feedback.innerText = `Зөв хариулт: ${correctAnswer} байлаа! 😉`;
+                feedback.className = "text-center text-xl font-bold h-8 text-yellow-300";
+                
+                selectedBtn.classList.add('opacity-50', 'scale-95');
+            }
+
+            updateStats();
+
+            setTimeout(() => {
+                if (questionIndex < totalQuestions) {
+                    nextQuestion();
+                } else {
+                    endGame();
+                }
+            }, 1500);
+        }
+
+        // Статистик шинэчлэх
+        function updateStats() {
+            document.getElementById('score-display').innerText = `${score} / ${totalQuestions}`;
+            
+            const streakTxt = document.getElementById('player-streak');
+            if (streak > 0) {
+                streakTxt.innerText = `Дараалсан зөв: ${streak} 🔥`;
+                streakTxt.className = "text-sm font-bold text-orange-400";
+            } else {
+                streakTxt.innerText = `Сансрын нисгэгч`;
+                streakTxt.className = "text-sm font-bold text-yellow-300";
+            }
+
+            const percentage = (questionIndex / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            
+            const rocket = document.getElementById('rocket-indicator');
+            const leftOffset = Math.min(percentage, 88); 
+            rocket.style.left = `calc(${leftOffset}% + 10px)`;
+        }
+
+        // Оноог үүлэн өгөгдлийн санд хадгалах
+        async function saveScoreToCloud() {
+            if (!useFirebase || !user) return;
+            try {
+                const uniqueDocId = `${user.uid}_${Date.now()}`;
+                const userScoreRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', uniqueDocId);
+                await setDoc(userScoreRef, {
+                    name: playerName,
+                    score: score,
+                    avatar: selectedAvatarChar,
+                    timestamp: Date.now(),
+                    userId: user.uid
+                });
+                console.log("Оноо амжилттай хадгалагдлаа!");
+            } catch (e) {
+                console.error("Оноо хадгалахад алдаа гарлаа:", e);
+            }
+        }
+
+        // Шилдэг оноонуудыг ачаалах
+        async function fetchLeaderboard(targetListId, targetLoadingId) {
+            const listContainer = document.getElementById(targetListId);
+            const loadingText = document.getElementById(targetLoadingId);
+            
+            listContainer.classList.add('hidden');
+            loadingText.classList.remove('hidden');
+
+            let scores = [];
+
+            if (useFirebase && user) {
+                try {
+                    const querySnapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard'));
+                    querySnapshot.forEach((doc) => {
+                        scores.push(doc.data());
+                    });
+                    
+                    scores.sort((a, b) => {
+                        if (b.score !== a.score) {
+                            return b.score - a.score;
+                        }
+                        return b.timestamp - a.timestamp;
+                    });
+                } catch (e) {
+                    console.error("Оноо уншихад алдаа гарлаа:", e);
+                }
+            }
+
+            if (scores.length === 0) {
+                scores = [
+                    { name: "Ананд Баатар", score: 10, avatar: "🐱", timestamp: Date.now() },
+                    { name: "Тулга", score: 9, avatar: "🦁", timestamp: Date.now() },
+                    { name: "Сарнай", score: 8, avatar: "🦊", timestamp: Date.now() }
+                ];
+            }
+
+            listContainer.innerHTML = "";
+            scores.slice(0, 10).forEach((item, index) => {
+                let badge = "";
+                let goldClass = "bg-white/5";
+                
+                if (index === 0) {
+                    badge = "🥇";
+                    goldClass = "bg-yellow-500/20 border border-yellow-400/50";
+                } else if (index === 1) {
+                    badge = "🥈";
+                    goldClass = "bg-slate-400/20 border border-slate-400/30";
+                } else if (index === 2) {
+                    badge = "🥉";
+                    goldClass = "bg-amber-600/20 border border-amber-600/30";
+                } else {
+                    badge = `<span class="text-xs text-slate-400 font-bold">${index + 1}</span>`;
+                }
+
+                const row = document.createElement('div');
+                row.className = `flex justify-between items-center p-2 rounded-xl text-sm ${goldClass}`;
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 text-center">${badge}</div>
+                        <span class="text-lg">${item.avatar || '🐱'}</span>
+                        <span class="font-bold text-white truncate max-w-[120px]">${item.name}</span>
+                    </div>
+                    <span class="font-extrabold text-yellow-300 bg-black/40 px-3 py-0.5 rounded-full">${item.score} оноо</span>
+                `;
+                listContainer.appendChild(row);
+            });
+
+            loadingText.classList.add('hidden');
+            listContainer.classList.remove('hidden');
+        }
+
+        // Тоглоом дуусах үеийн үр дүн
+        async function endGame() {
+            playSound('win');
+            
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            const stars = document.querySelectorAll('.star-item');
+            stars.forEach(star => {
+                star.classList.add('opacity-30', 'scale-50');
+                star.classList.remove('text-yellow-400', 'scale-110');
+            });
+
+            let earnedStars = 1;
+            if (score === 10) {
+                earnedStars = 3;
+            } else if (score >= 7) {
+                earnedStars = 2;
+            }
+
+            for (let i = 0; i < earnedStars; i++) {
+                setTimeout(() => {
+                    stars[i].classList.remove('opacity-30', 'scale-50');
+                    stars[i].classList.add('text-yellow-400', 'scale-110', 'pop-effect');
+                }, i * 300);
+            }
+
+            document.getElementById('final-stats').innerText = `Та ${totalQuestions} асуултоос ${score}-д нь зөв хариуллаа!`;
+            
+            const motivationText = document.getElementById('motivation-text');
+            if (score === 10) {
+                motivationText.innerText = `Гайхалтай, төгс байлаа! Та бол сансрын уудам дахь хамгийн ухаалаг математикогоороо тэргүүлэгч ${selectedAvatarChar} баатар юм! 🚀🏆`;
+            } else if (score >= 7) {
+                motivationText.innerText = `Маш сайн аялал боллоо! Хүрдээ маш сайн цээжилжээ. Илүү их дадлага хийж 3 од аваарай ${selectedAvatarChar}! ✨🌟`;
+            } else {
+                motivationText.innerText = `Сайн байна! Өөрийгөө битгий гол за юу. Хүрдээ дахин давтаад, дахиад нэг оролдоод үзээрэй ${selectedAvatarChar} 🧡💪`;
+            }
+
+            await saveScoreToCloud();
+            await fetchLeaderboard('result-leaderboard-list', 'result-leaderboard-loading');
+        }
+
+        // Дахин эхлүүлэх
+        function restartGame() {
+            playSound('click');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        // Самбар нээх/хаах функцууд
+        function showLeaderboardScreen() {
+            playSound('click');
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.remove('hidden');
+            fetchLeaderboard('global-leaderboard-list', 'global-leaderboard-loading');
+        }
+
+        function hideLeaderboardScreen() {
+            playSound('click');
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        window.selectAvatar = selectAvatar;
+        window.selectTable = selectTable;
+        window.startGame = startGame;
+        window.checkAnswer = checkAnswer;
+        window.restartGame = restartGame;
+        window.showLeaderboardScreen = showLeaderboardScreen;
+        window.hideLeaderboardScreen = hideLeaderboardScreen;
+
+    </script>
+</body>
+</html>
